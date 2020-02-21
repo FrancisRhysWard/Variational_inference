@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from gaussian_process import GaussianProcess
-from kernels.gaussian_kernel import GaussianKernel
 from kernels.gaussian_linear_kernel import GaussianLinearKernel
 from objective_functions.abstract_objective_function import ObjectiveFunction
 from objective_functions.sin import LinearSin
@@ -21,7 +20,7 @@ def get_log_upper_proba_distribution_gp(gaussian_process: GaussianProcess,
     - get_log_prior_at
 
     :param gaussian_process
-    :param theta: parameters at which we evaluate p_1. It is a numpy array (row vector) of shape (4,).
+    :param theta: parameters at which we evaluate p_1. In this example, it is a numpy array (row vector) of shape (4,).
     :return: log( p_1(theta | X, y) )
     """
     # TODO
@@ -30,7 +29,7 @@ def get_log_upper_proba_distribution_gp(gaussian_process: GaussianProcess,
 def metropolis_hastings_gaussian_process(gp: GaussianProcess,
                                          number_expected_samples: int,
                                          sigma_proposal_density: float,
-                                         number_hyperparameters_gaussian_process: int):
+                                         number_hyperparameters_gaussian_process:int ):
     """
    Performs a Metropolis Hastings procedure.
    This function is a generator. After each step, it should yield a tuple containing the following elements
@@ -38,7 +37,7 @@ def metropolis_hastings_gaussian_process(gp: GaussianProcess,
    -  is_sample_accepted (type: bool) which indicates if the last sample from the proposal density has been accepted
    -  np.array(list_samples): numpy array of size (S, 2) where S represents the total number of previously accepted
    samples, and 2 is the number of components in theta in this logistic regression task.
-   -  newly_sampled_theta: numpy array of size ()
+   -  newly_sampled_theta: numpy array of size (number_hyperparameters_gaussian_process,)
    -  u (type: float): last random number used for deciding if the newly_sampled_theta should be accepted or not.
 
 
@@ -48,8 +47,6 @@ def metropolis_hastings_gaussian_process(gp: GaussianProcess,
    We consider that the proposal density corresponds to a multivariate normal distribution, with:
    - mean = null vector
    - covariance matrix = (sigma_proposal_density ** 2) identity matrix
-   :param number_hyperparameters_gaussian_process: number of real hyperparameters to sample at each iteration. It
-   corresponds to the size of the vector of hyperparameters theta.
    """
 
     # ----- These are some the variables you should manipulate in the main loop of that function ----------
@@ -109,14 +106,15 @@ def test_metropolis_hastings(objective_function: ObjectiveFunction,
                              number_expected_samples: int,
                              sigma_exploration_mh: float,
                              number_hyperparameters_gaussian_process: int):
-
     boundaries = objective_function.boundaries
     number_dimensions = len(boundaries)
 
-    array_samples_parameters = metropolis_hastings_gaussian_process(gp,
-                                                                    number_expected_samples,
-                                                                    sigma_exploration_mh,
-                                                                    number_hyperparameters_gaussian_process=number_hyperparameters_gaussian_process)
+    array_samples_parameters = None
+    for is_accepted_sample, array_samples_parameters, *_ in metropolis_hastings_gaussian_process(gp,
+                                                                                                 number_expected_samples,
+                                                                                                 sigma_exploration_mh,
+                                                                                                 number_hyperparameters_gaussian_process=number_hyperparameters_gaussian_process):
+        pass
 
     if number_dimensions == 1:
         xlim, = boundaries
