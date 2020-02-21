@@ -54,10 +54,6 @@ def metropolis_hastings_gaussian_process(gp: GaussianProcess,
 
     newly_sampled_theta = None  # Last sampled parameters (from the proposal density q)
 
-    # Last sampled parameters (from the proposal density q) which were accepted
-    # according to the Metropolis-Hastings criterion
-    last_accepted_theta = np.zeros(number_hyperparameters_gaussian_process)
-
     is_sample_accepted = False  # Should be True if and only if the last sample has been accepted
 
     u = np.random.rand()  # Random number used for deciding if newly_sampled_theta should be accepted or not
