@@ -1,5 +1,9 @@
 # CO493 - Probabilistic Inference - Bayesian Optimisation Coursework
 
+## PDF Coursework
+
+You may find [here](/uploads/ad1c63bc16d57b2e580cfec82f08c151/C233___Coursework___VI___MCMC_1_.pdf) the coursework description.
+
 ## Requirements
 
 To install the requirements, use the following commands (with `python>=3.6` enabled by default):
