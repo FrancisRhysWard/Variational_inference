@@ -61,7 +61,7 @@ def metropolis_hastings(X: np.ndarray,
 
     # Last sampled parameters (from the proposal density q) which were accepted
     # according to the Metropolis-Hastings criterion
-    last_accepted_theta = np.zeros(X.shape[1]).reshape(1, -1)
+    last_accepted_theta = np.zeros(X.shape[1])
 
     is_sample_accepted = False  # Should be True if and only if the last sample has been accepted
 
