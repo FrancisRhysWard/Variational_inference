@@ -20,7 +20,8 @@ def get_log_upper_proba_distribution_gp(gaussian_process: GaussianProcess,
     - get_log_prior_at
 
     :param gaussian_process
-    :param theta: parameters at which we evaluate p_1. In this example, it is a numpy array (row vector) of shape (4,).
+    :param theta: parameters at which we evaluate p_1. In our example, it is a numpy array (row vector)
+    of shape (6,). As our linear + gaussian kernel depends on 6 real numbers.
     :return: log( p_1(theta | X, y) )
     """
     # TODO
@@ -28,25 +29,26 @@ def get_log_upper_proba_distribution_gp(gaussian_process: GaussianProcess,
 
 def metropolis_hastings_gaussian_process(gp: GaussianProcess,
                                          number_expected_samples: int,
-                                         sigma_proposal_density: float,
-                                         number_hyperparameters_gaussian_process:int ):
+                                         sigma_exploration_mh: float,
+                                         number_hyperparameters_gaussian_process: int):
     """
    Performs a Metropolis Hastings procedure.
    This function is a generator. After each step, it should yield a tuple containing the following elements
    (in this order):
    -  is_sample_accepted (type: bool) which indicates if the last sample from the proposal density has been accepted
-   -  np.array(list_samples): numpy array of size (S, 2) where S represents the total number of previously accepted
-   samples, and 2 is the number of components in theta in this logistic regression task.
+   -  np.array(list_samples): numpy array of size (S, 6) where S represents the total number of previously accepted
+   samples, and 6 is the number of components in theta in this Gaussian Process regression task.
    -  newly_sampled_theta: numpy array of size (number_hyperparameters_gaussian_process,)
    -  u (type: float): last random number used for deciding if the newly_sampled_theta should be accepted or not.
 
 
    :param gp: gaussian process. The goal of this method is to simulate a sampling from the posterior of gp
    :param number_expected_samples: Number of samples expected from the Metropolis Hastings procedure
-   :param sigma_proposal_density: Standard deviation of the proposal density.
+   :param sigma_exploration_mh: Standard deviation of the proposal density.
    We consider that the proposal density corresponds to a multivariate normal distribution, with:
    - mean = null vector
    - covariance matrix = (sigma_proposal_density ** 2) identity matrix
+   :param number_hyperparameters_gaussian_process: Number of hyperparameters for the kernel of the gp.
    """
 
     # ----- These are some the variables you should manipulate in the main loop of that function ----------
@@ -77,24 +79,17 @@ def calculate_variance_even_mixture_gaussians(list_means, list_variances):
 
 
 def get_estimated_mean_and_std(gp: GaussianProcess, array_samples_parameters, X):
-    means_list = []
-    variances_list = []
     functions_samples = []
     X = X.reshape((-1, gp.array_dataset.shape[1]))
 
     for num_samples, sample_gp_parameter in enumerate(array_samples_parameters):
         gp.set_kernel_parameters(*sample_gp_parameter.flatten())
         functions_samples.append(gp.get_sample(X))
-        # mean, std = gp.get_gp_mean_std(X)
-        # means_list.append(mean)
-        # variances_list.append(std ** 2)
 
         yield gp.get_sample(X)
 
         if num_samples % 50 == 0:
             print(f'num samples: {num_samples} \r')
-
-    # return sum_means / P, np.sqrt(sum_var) / P
 
 
 def test_metropolis_hastings(objective_function: ObjectiveFunction,
@@ -136,12 +131,12 @@ if __name__ == '__main__':
     np.random.seed(207)
     obj = LinearSin(0.5)
 
-    initial_dataset = obj.get_uniform_dataset(21).reshape((-1,1))
+    initial_dataset = obj.get_uniform_dataset(21).reshape((-1, 1))
     evaluations = obj(initial_dataset)
 
     # we use a linear combination of a gaussian and a linear kernel: k = k_gaussian + k_linear
     # Then, there are 4 parameters to sample from in the posterior distribution
-    kernel = GaussianLinearKernel(0., 0., 0., 0.)
+    kernel = GaussianLinearKernel(0., 0., 0., 0., 0., 0.)
     gp = GaussianProcess(kernel, initial_dataset, evaluations)
 
-    test_metropolis_hastings(obj, gp, 100, sigma_exploration_mh=0.4, number_hyperparameters_gaussian_process=4)
+    test_metropolis_hastings(obj, gp, 100, sigma_exploration_mh=0.4, number_hyperparameters_gaussian_process=6)

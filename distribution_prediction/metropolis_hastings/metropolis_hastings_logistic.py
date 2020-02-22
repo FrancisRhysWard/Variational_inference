@@ -22,7 +22,7 @@ def get_log_upper_proba_distribution(X: np.ndarray,
     each data point x. Each row of X represents one data point.
     :param y: column vector of shape (N, 1) indicating the class of p. for each point, y_i = 0 or 1.
     In addition, y_i = 1 is equivalent to "x_i is in C_1"
-    :param theta: parameters at which we evaluate p_1. In our example, It is a numpy array (row vector) of shape (2,).
+    :param theta: parameters at which we evaluate p_1. In our example, it is a numpy array (row vector) of shape (2,).
     :param sigma_prior: standard deviation of the prior on the parameters
     :return: log( p_1(theta | X, y) )
     """
@@ -32,7 +32,8 @@ def get_log_upper_proba_distribution(X: np.ndarray,
 def metropolis_hastings(X: np.ndarray,
                         y: np.ndarray,
                         number_expected_samples: int,
-                        sigma_proposal_density: float = 1.):
+                        sigma_exploration_mh: float=1,
+                        sigma_prior: float=1):
     """
     Performs a Metropolis Hastings procedure.
     This function is a generator. After each step, it should yield a tuple containing the following elements
@@ -48,10 +49,11 @@ def metropolis_hastings(X: np.ndarray,
     :param y: column vector of shape (N, 1) indicating the class of p. for each point, y_i = 0 or 1.
     In addition, y_i = 1 is equivalent to "x_i is in C_1"
     :param number_expected_samples: Number of samples expected from the Metropolis Hastings procedure
-    :param sigma_proposal_density: Standard deviation of the proposal density.
+    :param sigma_exploration_mh: Standard deviation of the proposal density.
     We consider that the proposal density corresponds to a multivariate normal distribution, with:
     - mean = null vector
     - covariance matrix = (sigma_proposal_density ** 2) identity matrix
+    :param sigma_prior: standard deviation of the prior on the parameters
     """
 
     # ----- These are some the variables you should manipulate in the main loop of that function ----------
@@ -85,4 +87,8 @@ def get_predictions(X_star: np.ndarray,
 
 
 if __name__ == '__main__':
-    plot_metropolis_hastings_logistics(1000, interactive=True)
+    plot_metropolis_hastings_logistics(num_samples=1000,
+                                       interactive=True,
+                                       sigma_exploration_mh=1,
+                                       sigma_prior=1,
+                                       number_points_per_class=5)

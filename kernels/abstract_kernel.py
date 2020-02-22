@@ -18,9 +18,9 @@ class Kernel(metaclass=abc.ABCMeta):
                        log_length_scale: float,
                        log_noise_scale: float,
                        ) -> None:
-        self._log_amplitude = log_amplitude
-        self._log_length_scale = log_length_scale
-        self._log_noise_scale = log_noise_scale
+        self.log_amplitude = log_amplitude
+        self.log_length_scale = log_length_scale
+        self.log_noise_scale = log_noise_scale
 
     @property
     def log_amplitude(self):

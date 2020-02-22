@@ -9,16 +9,24 @@ class GaussianLinearKernel(Kernel):
                  log_length_scale: float,
                  log_noise_scale: float,
                  log_amplitude_linear: float,
+                 log_offset:float,
+                 c: float
                  ):
         super(GaussianLinearKernel, self).__init__(log_amplitude_gaussian,
                                                    log_length_scale,
                                                    log_noise_scale,
                                                    )
         self.log_amplitude_linear = log_amplitude_linear
+        self.c = c
+        self.log_offset = log_offset
 
     @property
-    def amplitude_linear(self):
+    def amplitude_linear_squared(self):
         return np.exp(self.log_amplitude * 2)
+
+    @property
+    def offset_squared(self):
+        return np.exp(self.log_offset * 2)
 
     def get_covariance_matrix(self,
                               X: np.ndarray,
@@ -38,7 +46,7 @@ class GaussianLinearKernel(Kernel):
                 self.amplitude_squared
                 * np.exp((-1 / (2 * self.length_scale ** 2))
                          * (distances_array ** 2))
-        ) + self.amplitude_linear * X.dot(Y.T)
+        ) + self.amplitude_linear_squared * (X - self.c).dot(Y.T - self.c) + self.offset_squared
 
         return covariance_matrix
 
@@ -47,8 +55,12 @@ class GaussianLinearKernel(Kernel):
                        log_length_scale: float,
                        log_noise_scale: float,
                        log_amplitude_linear=0,
+                       c=0,
+                       log_offset=0,
                        ) -> None:
         self.log_amplitude_linear = log_amplitude_linear
+        self.c = c
+        self.log_offset = log_offset
         super(GaussianLinearKernel, self).set_parameters(log_amplitude, log_length_scale, log_noise_scale)
 
 
