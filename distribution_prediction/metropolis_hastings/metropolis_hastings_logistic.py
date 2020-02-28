@@ -80,7 +80,7 @@ def get_predictions(X_star: np.ndarray,
                     ) -> np.ndarray:
     """
     :param X_star: numpy array of shape (N, 2)
-    :param array_samples_theta: np array of shape (N, 2)
+    :param array_samples_theta: np array of shape (M, 2)
     :return: estimated predictions at each point in X_star: p(y_star, a column vector, shape=(N, 1)
     """
     # TODO
