@@ -60,6 +60,8 @@ def metropolis_hastings_gaussian_process(gp: GaussianProcess,
 
     u = np.random.rand()  # Random number used for deciding if newly_sampled_theta should be accepted or not
 
+    first_theta = np.zeros(number_hyperparameters_gaussian_process)
+
     # -------------------------------------------------------------------------------------------------
 
     while len(list_samples) < number_expected_samples:
@@ -117,11 +119,13 @@ def test_metropolis_hastings(objective_function: ObjectiveFunction,
         plt.title(f"Gaussian Process Regression")
         for function_sample in get_estimated_mean_and_std(gp, array_samples_parameters, xx.reshape((-1, 1))):
 
-            plt.plot(xx, function_sample)
+            plt.plot(xx, function_sample, alpha=0.3, c='C0')
             plt.scatter(gp.array_dataset,
                         gp.array_objective_function_values,
                         c='m',
-                        marker='o', zorder=1000, s=(100,))
+                        marker="+",
+                        zorder=1000,
+                        s=(30,))
             plt.pause(0.05)
         plt.show()
 

@@ -65,6 +65,8 @@ def metropolis_hastings(X: np.ndarray,
 
     u = np.random.rand()  # Random number used for deciding if newly_sampled_theta should be accepted or not
 
+    first_theta = np.zeros(X.shape[1])
+
     # -------------------------------------------------------------------------------------------------
 
     while len(list_samples) < number_expected_samples:
@@ -91,4 +93,4 @@ if __name__ == '__main__':
                                        interactive=True,
                                        sigma_exploration_mh=1,
                                        sigma_prior=1,
-                                       number_points_per_class=5)
+                                       number_points_per_class=25)
