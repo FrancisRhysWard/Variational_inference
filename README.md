@@ -2,7 +2,7 @@
 
 ## PDF Coursework
 
-You may find [here](/uploads/ad1c63bc16d57b2e580cfec82f08c151/C233___Coursework___VI___MCMC_1_.pdf) the coursework description.
+You may find [here](/uploads/4e13e70dc8cefe25fbf5b4bcf8ff3710/C233___Coursework___VI___MCMC_2_.pdf) the coursework description.
 
 ## Requirements
 
