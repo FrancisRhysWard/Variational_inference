@@ -82,7 +82,7 @@ def _get_log_marginal_likelihood_gp(amplitude_gaussian_squared: float,
     :param distances_array:
     :return: The log-marginal likelihood of the Gaussian Process whose kernel is defined by the parameters above
     """
-    K = get_cov_matrix_gaussian_linear(amplitude_gaussian_squared, length_scale, amplitude_linear_squared, c, offset_squared, X,
+    K = get_cov_matrix_gaussian_linear(amplitude_gaussian_squared, length_scale, amplitude_linear_squared, offset_squared, c, X,
                                        X, distances_array)
 
     K_noise = K + noise_scale_squared * np.identity(K.shape[0])
