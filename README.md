@@ -2,7 +2,7 @@
 
 ## PDF Coursework
 
-You may find [here](/uploads/4e13e70dc8cefe25fbf5b4bcf8ff3710/C233___Coursework___VI___MCMC_2_.pdf) the coursework description.
+You may find [here](https://gitlab.doc.ic.ac.uk/lg4615/co493-coursework-mcmc-vi-students/-/blob/master/C493_Coursework.pdf) the coursework description.
 
 ## Requirements
 
