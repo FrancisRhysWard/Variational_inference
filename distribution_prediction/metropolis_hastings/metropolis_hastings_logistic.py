@@ -1,8 +1,9 @@
 import numpy as np
-
+from scipy.stats import norm, bernoulli
+from scipy.stats import multivariate_normal
 
 from distribution_prediction.metropolis_hastings.utils_plots import plot_metropolis_hastings_logistics
-
+from distribution_prediction.utils import sigmoid
 
 def get_log_upper_proba_distribution(X: np.ndarray,
                                      y: np.ndarray,
@@ -26,7 +27,15 @@ def get_log_upper_proba_distribution(X: np.ndarray,
     :param sigma_prior: standard deviation of the prior on the parameters
     :return: log( p_1(theta | X, y) )
     """
-    # TODO
+
+    sig = sigmoid(X, np.transpose(theta))
+    likelihood = bernoulli.pmf(y, sig.reshape(y.shape))
+    theta_prior_pdf = multivariate_normal.pdf(theta, mean=np.zeros(theta.shape), cov=sigma_prior*np.eye(theta.shape[0]))
+
+    
+    return np.log(np.prod(likelihood.flatten()) * theta_prior_pdf)
+   
+    
 
 
 def metropolis_hastings(X: np.ndarray,
@@ -73,9 +82,28 @@ def metropolis_hastings(X: np.ndarray,
         #########################
         # TODO : Complete Here
         #########################
+        
+        q_old = multivariate_normal(mean=first_theta, cov=sigma_exploration_mh**2 * np.eye(first_theta.shape[0]))
+        newly_sampled_theta = q_old.rvs()
+        q_new = multivariate_normal(mean=newly_sampled_theta, cov=sigma_exploration_mh**2 * np.eye(newly_sampled_theta.shape[0]))
+        
+        q_new_given_old = q_old.pdf(newly_sampled_theta)
+        q_old_given_new = q_new.pdf(first_theta)
+        
+        p_old = np.exp(get_log_upper_proba_distribution(X, y, first_theta, sigma_prior))
+        p_new = np.exp(get_log_upper_proba_distribution(X, y, newly_sampled_theta, sigma_prior))
+        
+        #print(q_new_given_old, q_old_given_new, p_old, p_new)
 
+        is_sample_accepted = (((q_old_given_new*p_new)/(q_new_given_old*p_old)) >= u)
+        
+        if is_sample_accepted:
+            list_samples.append(newly_sampled_theta)
+            first_theta = newly_sampled_theta
+        
         yield is_sample_accepted, np.array(list_samples), newly_sampled_theta, u
-
+        
+        u = np.random.rand()
 
 def get_predictions(X_star: np.ndarray,
                     array_samples_theta: np.ndarray
@@ -89,10 +117,20 @@ def get_predictions(X_star: np.ndarray,
     where each x_star corresponds to a row in X_star. The result should be a column vector of shape (N, 1), its i'th
     row should be equal to the prediction p(C_1|X,y,x_star_i) where x_star_i corresponds to the i'th row in X_star
     """
-    # TODO
-
+    #y_star = []
+    
+    #for x_i in X_star:
+    #    likelihoods = []
+    #    for theta in array_samples_theta:
+    #        sig = sigmoid(x_i, np.transpose(theta))
+    #    
+    #    y_star.append(np.mean(likelihoods))
+    #return np.array(y_star)
+    return np.mean(sigmoid(X_star, array_samples_theta), axis=-1)
 
 if __name__ == '__main__':
+        
+        
     plot_metropolis_hastings_logistics(num_samples=1000,
                                        interactive=True,
                                        sigma_exploration_mh=1,

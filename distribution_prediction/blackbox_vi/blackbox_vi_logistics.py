@@ -1,9 +1,10 @@
 import jax.numpy as np
 import numpy as onp
 from jax import grad
+from jax.random import bernoulli
 
 from distribution_prediction.blackbox_vi.utils_plots import plot_vi_logistics
-
+from scipy.stats import multivariate_normal
 
 def sigmoid(X: np.ndarray,
             theta: np.ndarray
@@ -35,7 +36,19 @@ def kl_div(mu: np.ndarray,
     N(mean=0, variance=(sigma_prior**2) I)
     :return: the value of the KL divergence
     """
-    # TODO
+    d = mu.shape[1]
+
+    theta_post_cov = A @ np.transpose(A)
+    theta_prior_cov = (sigma_prior ** 2) * np.eye(d)
+
+    t1 = np.log(np.linalg.det(theta_prior_cov)/np.linalg.det(theta_post_cov)) - d
+    t2 = np.trace(np.linalg.inv(theta_prior_cov)@theta_post_cov)
+    t3 = mu @ np.linalg.inv(theta_prior_cov) @ np.transpose(mu)
+
+    kl = 0.5*(t1 + t2 + t3)
+
+    return kl[0][0]
+
 
 
 def expected_log_likelihood(mu: np.ndarray,
@@ -56,7 +69,17 @@ def expected_log_likelihood(mu: np.ndarray,
     :return: The expected log-likelihood. That expectation is calculated according to the approximated posterior
     N(mu, Sigma) by using the samples in epsilon.
     """
-    # TODO
+
+    S = []
+    for e in epsilon:
+        theta = mu + A @ e
+        p = sigmoid(X, theta)
+        bernoulli_pmf = p * y + (1-p)*(1-y)
+        #S.append(np.prod(bernoulli_pmf))
+        S.append(np.sum(np.log(bernoulli_pmf)))
+    m = np.sum(S)/len(S)
+    return m
+
 
 
 def variational_inference_logistics(X: np.ndarray,
@@ -103,6 +126,12 @@ def variational_inference_logistics(X: np.ndarray,
     mu_grad = None
     A_grad = None
 
+
+    def L(mu, A):
+        kl = kl_div(mu, A, sigma_prior)
+        E = expected_log_likelihood(mu, A, epsilon, X, y)
+        return E - kl
+
     while counter < number_iterations:
         mu_old = mu
         A_old = A
@@ -110,6 +139,17 @@ def variational_inference_logistics(X: np.ndarray,
         #############################
         # TODO : Complete Here for computing epsilon, mu_grad and A_grad
         #############################
+
+
+        epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=sigma_prior**2*np.eye(P), size=num_samples_per_turn)
+
+        #kl = kl_div(mu_old, A_old, sigma_prior)
+        #E = expected_log_likelihood(mu_old, A_old, epsilon, X, y)
+
+        print('aaahhh')
+
+        mu_grad = grad(L, argnums=0)(mu_old, A_old)
+        A_grad = grad(L, argnums=1)(mu_old, A_old)
 
         # Performing a gradient descent step on A and mu
         # (we make sure that the elements on the diagonal of A remain superior to 1e-5)

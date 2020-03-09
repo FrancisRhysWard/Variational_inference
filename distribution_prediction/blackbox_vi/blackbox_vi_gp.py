@@ -4,6 +4,7 @@ import numpy as onp
 from jax import grad
 from jax.config import config
 
+from scipy.stats import multivariate_normal
 from distribution_prediction.blackbox_vi.utils_plots import plot_vi_gp
 
 config.update("jax_debug_nans", True)
@@ -118,7 +119,15 @@ def expected_log_marginal_likelihood(mu: np.ndarray,
     :return: The expected log-likelihood. That expectation is calculated according to the approximated posterior
     N(mu, Sigma) by using the samples in epsilon.
     """
-    # TODO
+    S = []
+    for e in epsilon:
+        dist = get_distances_array(X, X)
+        theta = mu + A @ e
+        amplitude_gaussian_squared, length_scale, noise_scale_squared, amplitude_linear_squared, offset_squared, c = theta[0]
+        log_m_likelihood = _get_log_marginal_likelihood_gp(amplitude_gaussian_squared, length_scale, noise_scale_squared, amplitude_linear_squared, offset_squared, c, X, y, dist)
+        S.append(np.sum(log_m_likelihood))
+    m = np.sum(S)/len(S)
+    return m
 
 
 def kl_div(mu: np.ndarray,
@@ -140,8 +149,21 @@ def kl_div(mu: np.ndarray,
     N(mean=0, variance=(sigma_prior**2) I)
     :return: the value of the KL divergence
     """
-    # TODO
+    #theta_prior = np.exp(gaussian_process.get_log_prior_at(*theta))
+    #theta_post = multivariate_normal(mean=mu, cov=A_chol@np.transpose(A_chol))
 
+    d = mu.shape[1]
+
+    theta_prior_cov = sigma_prior**2*np.eye(d)
+    theta_post_cov = A_chol@np.transpose(A_chol)
+
+    t1 = np.log(np.linalg.det(theta_prior_cov)/np.linalg.det(theta_post_cov)) - d
+    t2 = np.trace(np.linalg.inv(theta_prior_cov)@theta_post_cov)
+    t3 = mu @ np.linalg.inv(theta_prior_cov) @ np.transpose(mu)
+
+    kl = 0.5*(t1 + t2 + t3)
+
+    return kl[0][0]
 
 def variational_inference_gp(X: np.ndarray,
                              y: np.ndarray,
@@ -191,6 +213,11 @@ def variational_inference_gp(X: np.ndarray,
     mu_grad = None
     A_grad = None
 
+    def L(mu, A):
+        kl = kl_div(mu, A, sigma_prior)
+        E = expected_log_marginal_likelihood(mu, A, epsilon, X, y)
+        return E - kl
+
     while counter < number_iterations:
         A_old = A
         mu_old = mu
@@ -198,6 +225,10 @@ def variational_inference_gp(X: np.ndarray,
         #############################
         # TODO : Complete Here for computing epsilon, mu_grad and A_grad
         #############################
+        epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=sigma_prior**2*np.eye(P), size=num_samples_per_turn)
+
+        mu_grad = grad(L, argnums=0)(mu_old, A_old)
+        A_grad = grad(L, argnums=1)(mu_old, A_old)
 
         # Performing a gradient descent step on A and mu
         # (we make sure that the elements on the diagonal of A remain superior to 1e-5)
