@@ -26,9 +26,9 @@ def get_log_upper_proba_distribution_gp(gaussian_process: GaussianProcess,
     :return: log( p_1(theta | X, y) )
     """
     log_theta_prior = gaussian_process.get_log_prior_at(*theta)
-    
+
     log_m_likelihood = gaussian_process.get_log_marginal_likelihood(*theta)
-    
+
     return log_m_likelihood + log_theta_prior
 
 
@@ -75,24 +75,25 @@ def metropolis_hastings_gaussian_process(gp: GaussianProcess,
         #########################
         q_old = multivariate_normal(mean=first_theta, cov=sigma_exploration_mh**2 * np.eye(first_theta.shape[0]))
         newly_sampled_theta = q_old.rvs()
-        q_new = multivariate_normal(mean=newly_sampled_theta, cov=sigma_exploration_mh**2 * np.eye(newly_sampled_theta.shape[0]))
-        
-        q_new_given_old = q_old.pdf(newly_sampled_theta)
-        q_old_given_new = q_new.pdf(first_theta)
-        
+        #q_new = multivariate_normal(mean=newly_sampled_theta, cov=sigma_exploration_mh**2 * np.eye(newly_sampled_theta.shape[0]))
+
+        #q_new_given_old = q_old.pdf(newly_sampled_theta)
+        #q_old_given_new = q_new.pdf(first_theta)
+
         p_old = np.exp(get_log_upper_proba_distribution_gp(gp, first_theta))
         p_new = np.exp(get_log_upper_proba_distribution_gp(gp, newly_sampled_theta))
-        
+
         #print(q_new_given_old, q_old_given_new, p_old, p_new)
 
-        is_sample_accepted = (((q_old_given_new*p_new)/(q_new_given_old*p_old)) >= u)
-        
+        #is_sample_accepted = (((q_old_given_new*p_new)/(q_new_given_old*p_old)) >= u)
+        is_sample_accepted = (p_new/p_old >= u)
+
         if is_sample_accepted:
             list_samples.append(newly_sampled_theta)
             first_theta = newly_sampled_theta
-        
+
         yield is_sample_accepted, np.array(list_samples), newly_sampled_theta, u
-        
+
         u = np.random.rand()
 
 def calculate_variance_even_mixture_gaussians(list_means, list_variances):
