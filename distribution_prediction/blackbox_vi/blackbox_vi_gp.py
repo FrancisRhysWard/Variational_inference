@@ -119,6 +119,8 @@ def expected_log_marginal_likelihood(mu: np.ndarray,
     :return: The expected log-likelihood. That expectation is calculated according to the approximated posterior
     N(mu, Sigma) by using the samples in epsilon.
     """
+    mu.reshape(-1, 6)
+
     S = []
     for e in epsilon:
         dist = get_distances_array(X, X)
@@ -153,7 +155,7 @@ def kl_div(mu: np.ndarray,
     """
     #theta_prior = np.exp(gaussian_process.get_log_prior_at(*theta))
     #theta_post = multivariate_normal(mean=mu, cov=A_chol@np.transpose(A_chol))
-
+    mu.reshape(-1, 6)
     d = mu.shape[1]
 
     theta_prior_cov = sigma_prior**2*np.eye(d)
@@ -227,7 +229,7 @@ def variational_inference_gp(X: np.ndarray,
         #############################
         # TODO : Complete Here for computing epsilon, mu_grad and A_grad
         #############################
-        epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=sigma_prior**2*np.eye(P), size=num_samples_per_turn)
+        epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=np.eye(P), size=num_samples_per_turn)
 
         mu_grad = grad(L, argnums=0)(mu_old, A_old)
         A_grad = grad(L, argnums=1)(mu_old, A_old)

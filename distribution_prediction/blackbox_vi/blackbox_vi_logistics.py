@@ -36,6 +36,9 @@ def kl_div(mu: np.ndarray,
     N(mean=0, variance=(sigma_prior**2) I)
     :return: the value of the KL divergence
     """
+
+
+    mu.reshape(-1, 2)
     d = mu.shape[1]
 
     theta_post_cov = A @ np.transpose(A)
@@ -69,7 +72,7 @@ def expected_log_likelihood(mu: np.ndarray,
     :return: The expected log-likelihood. That expectation is calculated according to the approximated posterior
     N(mu, Sigma) by using the samples in epsilon.
     """
-
+    mu.reshape(-1, 2)
     S = []
     for e in epsilon:
         theta = mu + A @ e
@@ -141,8 +144,8 @@ def variational_inference_logistics(X: np.ndarray,
         #############################
 
 
-        epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=sigma_prior**2*np.eye(P), size=num_samples_per_turn)
-
+        #epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=sigma_prior**2*np.eye(P), size=num_samples_per_turn)
+        epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=np.eye(P), size=num_samples_per_turn)
         #kl = kl_div(mu_old, A_old, sigma_prior)
         #E = expected_log_likelihood(mu_old, A_old, epsilon, X, y)
 
