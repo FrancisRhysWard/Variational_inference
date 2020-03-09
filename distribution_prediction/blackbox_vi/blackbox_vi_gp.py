@@ -124,6 +124,8 @@ def expected_log_marginal_likelihood(mu: np.ndarray,
         dist = get_distances_array(X, X)
         theta = mu + A @ e
         amplitude_gaussian_squared, length_scale, noise_scale_squared, amplitude_linear_squared, offset_squared, c = theta[0]
+        print("*************************")
+        print(amplitude_gaussian_squared, length_scale, noise_scale_squared, amplitude_linear_squared, offset_squared, c)
         log_m_likelihood = _get_log_marginal_likelihood_gp(amplitude_gaussian_squared, length_scale, noise_scale_squared, amplitude_linear_squared, offset_squared, c, X, y, dist)
         S.append(np.sum(log_m_likelihood))
     m = np.sum(S)/len(S)
