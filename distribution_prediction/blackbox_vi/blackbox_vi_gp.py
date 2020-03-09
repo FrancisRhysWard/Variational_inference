@@ -154,7 +154,7 @@ def kl_div(mu: np.ndarray,
     """
     #theta_prior = np.exp(gaussian_process.get_log_prior_at(*theta))
     #theta_post = multivariate_normal(mean=mu, cov=A_chol@np.transpose(A_chol))
-    mu.reshape(-1, 6)
+    mu.reshape(6, -1)
     d = mu.shape[1]
 
     theta_prior_cov = sigma_prior**2*np.eye(d)

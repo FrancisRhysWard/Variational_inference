@@ -38,7 +38,7 @@ def kl_div(mu: np.ndarray,
     """
 
 
-    mu.reshape(-1, 2)
+    mu.reshape(2,-1)
     d = mu.shape[1]
 
     theta_post_cov = A @ np.transpose(A)
