@@ -119,6 +119,7 @@ def expected_log_marginal_likelihood(mu: np.ndarray,
     :return: The expected log-likelihood. That expectation is calculated according to the approximated posterior
     N(mu, Sigma) by using the samples in epsilon.
     """
+    #test
     mu = mu.reshape(-1, 6)
     epsilon = epsilon.reshape(-1,6)
     S = []
