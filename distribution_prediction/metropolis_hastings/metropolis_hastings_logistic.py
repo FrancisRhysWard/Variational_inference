@@ -31,7 +31,7 @@ def get_log_upper_proba_distribution(X: np.ndarray,
     p = sigmoid(X, np.transpose(theta))
 
     likelihood = bernoulli.logpmf(y, p.reshape(y.shape))
-    theta_prior_pdf = multivariate_normal.logpdf(theta, mean=np.zeros(theta.shape), cov=sigma_prior*np.eye(theta.shape[0]))
+    theta_prior_pdf = multivariate_normal.logpdf(theta, mean=np.zeros(theta.shape), cov=sigma_prior**2*np.eye(theta.shape[0]))
 
 
     return np.sum(likelihood.flatten()) + theta_prior_pdf
