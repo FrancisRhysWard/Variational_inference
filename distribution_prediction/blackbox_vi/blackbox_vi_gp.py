@@ -120,7 +120,7 @@ def expected_log_marginal_likelihood(mu: np.ndarray,
     N(mu, Sigma) by using the samples in epsilon.
     """
     mu.reshape(-1, 6)
-
+    epsilon.reshape(-1,6)
     S = []
     for e in epsilon:
         dist = get_distances_array(X, X)

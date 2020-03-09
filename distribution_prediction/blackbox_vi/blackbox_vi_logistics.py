@@ -73,6 +73,7 @@ def expected_log_likelihood(mu: np.ndarray,
     N(mu, Sigma) by using the samples in epsilon.
     """
     mu.reshape(-1, 2)
+    epsilon.reshape(-1,2)
     S = []
     for e in epsilon:
         theta = mu + A @ e
