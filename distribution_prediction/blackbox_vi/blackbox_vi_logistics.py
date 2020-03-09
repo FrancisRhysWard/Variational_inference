@@ -38,7 +38,7 @@ def kl_div(mu: np.ndarray,
     """
 
 
-    mu.reshape(2,-1)
+    mu = mu.reshape(-1,2)
     d = mu.shape[1]
 
     theta_post_cov = A @ np.transpose(A)
@@ -72,8 +72,8 @@ def expected_log_likelihood(mu: np.ndarray,
     :return: The expected log-likelihood. That expectation is calculated according to the approximated posterior
     N(mu, Sigma) by using the samples in epsilon.
     """
-    mu.reshape(-1, 2)
-    epsilon.reshape(-1,2)
+    mu = mu.reshape(-1, 2)
+    epsilon = epsilon.reshape(-1,2)
     S = []
     for e in epsilon:
         theta = mu + A @ e
