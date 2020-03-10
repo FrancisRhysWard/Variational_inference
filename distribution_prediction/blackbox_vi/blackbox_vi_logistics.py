@@ -144,13 +144,7 @@ def variational_inference_logistics(X: np.ndarray,
         # TODO : Complete Here for computing epsilon, mu_grad and A_grad
         #############################
 
-
-        #epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=sigma_prior**2*np.eye(P), size=num_samples_per_turn)
         epsilon = multivariate_normal.rvs(mean=np.zeros(shape=P), cov=np.eye(P), size=num_samples_per_turn)
-        #kl = kl_div(mu_old, A_old, sigma_prior)
-        #E = expected_log_likelihood(mu_old, A_old, epsilon, X, y)
-
-        print('aaahhh')
 
         mu_grad = grad(L, argnums=0)(mu_old, A_old)
         A_grad = grad(L, argnums=1)(mu_old, A_old)
